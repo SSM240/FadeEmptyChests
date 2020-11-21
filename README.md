@@ -1,7 +1,7 @@
 # FadeEmptyChests
 A mod for Risk of Rain 2 that makes chests and other containers fade out and become partially transparent after being opened.
 
-More information can be found on the Thunderstore page [INSERT LINK]
+More information can be found on [the Thunderstore page](https://thunderstore.io/package/SSM24/FadeEmptyChests/).
 
 If you have any issues or suggestions, ping me on Discord (SSM24#0079) or open an issue. Pinging me on Discord is preferred, since I check that much more often than GitHub.
 
