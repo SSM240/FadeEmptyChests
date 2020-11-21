@@ -22,10 +22,6 @@ namespace SSM24.FadeEmptyChests
         private float currentFade = 1f;
         private float currentBrightness = 1f;
 
-        private bool fuck = false;
-
-        //private Color currentColor => Color.white * currentBrightness;
-
         private void Start()
         {
             propertyStorage = new MaterialPropertyBlock();
