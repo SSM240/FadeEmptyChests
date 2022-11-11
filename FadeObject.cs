@@ -34,7 +34,6 @@ namespace SSM24.FadeEmptyChests
             renderers = gameObject.GetComponentsInChildren<Renderer>();
             StartCoroutine(WaitUntilVisible());
             StartCoroutine(InterpolateBrightnessAndFade());
-            FadeEmptyChests.Log(LogLevel.Debug, $"Object name: {gameObject.name}");
         }
 
         private bool HasDitherModel(Renderer renderer)
