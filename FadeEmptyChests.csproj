@@ -47,8 +47,8 @@
       <HintPath>E:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
       <CopyLocal>False</CopyLocal>
     </Reference>
-    <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\SharedModpack\BepInEx\plugins\RiskofThunder-HookGenPatcher\MMHOOK\MMHOOK_Assembly-CSharp.dll</HintPath>
+    <Reference Include="MMHOOK_RoR2">
+      <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\test\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
       <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Mono.Cecil">

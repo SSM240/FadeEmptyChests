@@ -69,7 +69,7 @@ namespace SSM24.FadeEmptyChests
             On.EntityStates.Barrel.Opened.OnEnter += On_Opened_OnEnter;
             // TODO: figure out either clientside methods or a good way to sync it
             On.RoR2.RouletteChestController.Opened.OnEnter += On_Opened_OnEnter;
-            On.RoR2.MultiShopController.DisableAllTerminals += On_MultiShopController_DisableAllTerminals;
+            On.RoR2.MultiShopController.OnPurchase += On_MultiShopController_OnPurchase;
         }
 
         internal static void Log(LogLevel level, object data)
@@ -85,18 +85,38 @@ namespace SSM24.FadeEmptyChests
             transform.gameObject.AddComponent<FadeObject>();
         }
 
-        private void On_MultiShopController_DisableAllTerminals(
-            On.RoR2.MultiShopController.orig_DisableAllTerminals orig, 
-            MultiShopController self, Interactor interactor)
+        private void On_MultiShopController_OnPurchase(
+            On.RoR2.MultiShopController.orig_OnPurchase orig, 
+            MultiShopController self, Interactor interactor, PurchaseInteraction purchaseInteraction)
         {
-            orig(self, interactor);
+            orig(self, interactor, purchaseInteraction);
             if (ShouldApplyToMultishops.Value && NetworkServer.active)
             {
                 DynData<MultiShopController> controllerData = new DynData<MultiShopController>(self);
-                GameObject[] terminalGameObjects = controllerData.Get<GameObject[]>("terminalGameObjects");
-                foreach (GameObject terminalObject in terminalGameObjects)
+                GameObject[] terminalGameObjects = controllerData.Get<GameObject[]>("_terminalGameObjects");
+                bool[] doCloseOnTerminalPurchase = controllerData.Get<bool[]>("doCloseOnTerminalPurchase");
+                // logic basically just copypasted from MultiShopController
+                bool noCard = false;
+                for (int i = 0; i < terminalGameObjects.Length; i++)
                 {
-                    terminalObject.AddComponent<FadeObject>();
+                    GameObject terminalObject = terminalGameObjects[i];
+                    PurchaseInteraction interaction = terminalObject.GetComponent<PurchaseInteraction>();
+                    if (purchaseInteraction == interaction)
+                    {
+                        terminalObject.AddComponent<FadeObject>();
+                        noCard = doCloseOnTerminalPurchase[i];
+                    }
+                }
+                if (noCard)
+                {
+                    foreach (GameObject terminalObject in terminalGameObjects)
+                    {
+                        // don't double-add
+                        if (terminalObject.GetComponent<FadeObject>() == null)
+                        {
+                            terminalObject.AddComponent<FadeObject>();
+                        }
+                    }
                 }
             }
         }
