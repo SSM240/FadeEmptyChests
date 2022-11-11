@@ -1,9 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using EntityStates;
 using MonoMod.Utils;
 using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SSM24.FadeEmptyChests
 {
@@ -15,11 +17,13 @@ namespace SSM24.FadeEmptyChests
         public static ConfigEntry<float> BrightnessMultiplier;
         public static ConfigEntry<float> FadeOutTime;
         public static ConfigEntry<bool> ShouldApplyToMultishops;
+        public static ConfigEntry<bool> ShouldApplyToAdaptiveChests;
 
         const float default_FadeMultiplier = 0.25f;
         const float default_BrightnessMultiplier = 0.5f;
         const float default_FadeOutTime = 1f;
         const bool default_ShouldApplyToMultishops = false;
+        const bool default_ShouldApplyToAdaptiveChests = false;
 
         internal static FadeEmptyChests Instance;
 
@@ -55,13 +59,20 @@ namespace SSM24.FadeEmptyChests
                 default_ShouldApplyToMultishops,
                 "Whether multishops should fade out after use."
             );
+            ShouldApplyToAdaptiveChests = Config.Bind(
+                "FadeEmptyChests",
+                "ShouldApplyToAdaptiveChests",
+                default_ShouldApplyToAdaptiveChests,
+                "Whether adaptive chests should fade out after use."
+            );
 
             On.EntityStates.Barrel.Opened.OnEnter += On_Opened_OnEnter;
-            // TODO: figure out a clientside method to hook here
+            // TODO: figure out either clientside methods or a good way to sync it
+            On.RoR2.RouletteChestController.Opened.OnEnter += On_Opened_OnEnter;
             On.RoR2.MultiShopController.DisableAllTerminals += On_MultiShopController_DisableAllTerminals;
         }
 
-        public static void Log(LogLevel level, object data)
+        internal static void Log(LogLevel level, object data)
         {
             Instance.Logger.Log(level, data);
         }
@@ -70,7 +81,8 @@ namespace SSM24.FadeEmptyChests
             On.EntityStates.Barrel.Opened.orig_OnEnter orig, EntityStates.Barrel.Opened self)
         {
             orig(self);
-            self.outer.commonComponents.modelLocator.modelTransform.gameObject.AddComponent<FadeObject>();
+            Transform transform = self.outer.commonComponents.modelLocator.modelTransform;
+            transform.gameObject.AddComponent<FadeObject>();
         }
 
         private void On_MultiShopController_DisableAllTerminals(
@@ -78,7 +90,7 @@ namespace SSM24.FadeEmptyChests
             MultiShopController self, Interactor interactor)
         {
             orig(self, interactor);
-            if (ShouldApplyToMultishops.Value)
+            if (ShouldApplyToMultishops.Value && NetworkServer.active)
             {
                 DynData<MultiShopController> controllerData = new DynData<MultiShopController>(self);
                 GameObject[] terminalGameObjects = controllerData.Get<GameObject[]>("terminalGameObjects");
@@ -86,6 +98,16 @@ namespace SSM24.FadeEmptyChests
                 {
                     terminalObject.AddComponent<FadeObject>();
                 }
+            }
+        }
+
+        private void On_Opened_OnEnter(On.RoR2.RouletteChestController.Opened.orig_OnEnter orig, EntityState self)
+        {
+            orig(self);
+            if (ShouldApplyToAdaptiveChests.Value && NetworkServer.active)
+            {
+                Transform transform = self.outer.commonComponents.modelLocator.modelTransform;
+                transform.GetChild(1).gameObject.AddComponent<FadeObject>();
             }
         }
     }

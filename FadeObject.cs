@@ -1,10 +1,12 @@
 ﻿using BepInEx.Logging;
 using RoR2;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using MonoMod.Utils;
 
 namespace SSM24.FadeEmptyChests
 {
@@ -22,13 +24,43 @@ namespace SSM24.FadeEmptyChests
         private float currentFade = 1f;
         private float currentBrightness = 1f;
 
+        private static BindingFlags staticPrivate = BindingFlags.Static | BindingFlags.NonPublic;
+        private static List<DitherModel> instancesList =
+            (List<DitherModel>)typeof(DitherModel).GetField("instancesList", staticPrivate).GetValue(null);
+
         private void Start()
         {
             propertyStorage = new MaterialPropertyBlock();
             renderers = gameObject.GetComponentsInChildren<Renderer>();
-            StartCoroutine(LerpBrightnessAndFade());
             StartCoroutine(WaitUntilVisible());
+            StartCoroutine(InterpolateBrightnessAndFade());
             FadeEmptyChests.Log(LogLevel.Debug, $"Object name: {gameObject.name}");
+        }
+
+        private bool HasDitherModel(Renderer renderer)
+        {
+            // check for cached result in DynData
+            DynData<Renderer> rendererData = new DynData<Renderer>(renderer);
+            object hasDitherModelInData = rendererData["hasDitherModel"];
+            if (hasDitherModelInData != null)
+            {
+                return (bool)hasDitherModelInData;
+            }
+            // if not found, loop through DitherModel instances
+            bool foundInDitherModels = false;
+            // using DynData doesn't seem to work on static fields, have to use reflection
+            foreach (DitherModel ditherModel in instancesList)
+            {
+                if (ditherModel.renderers.Contains(renderer))
+                {
+                    foundInDitherModels = true;
+                    break;
+                }
+            }
+            FadeEmptyChests.Log(LogLevel.Debug, 
+                $"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
+            rendererData["hasDitherModel"] = foundInDitherModels;
+            return foundInDitherModels;
         }
 
         private void RefreshRenderers()
@@ -48,7 +80,6 @@ namespace SSM24.FadeEmptyChests
             {
                 if (renderer == null)
                 {
-                    // epic 1
                     RefreshRenderers();
                     FadeEmptyChests.Log(LogLevel.Warning,
                         "Renderers became null, refreshing reference to renderers");
@@ -64,13 +95,13 @@ namespace SSM24.FadeEmptyChests
             return result;
         }
 
-        private IEnumerator LerpBrightnessAndFade()
+        private IEnumerator InterpolateBrightnessAndFade()
         {
             float currentLerp = 0f;
             while (currentLerp <= 1f)
             {
-                currentFade = Mathf.Lerp(1f, TargetFade, currentLerp);
-                currentBrightness = Mathf.Lerp(1f, TargetBrightness, currentLerp);
+                currentFade = Mathf.SmoothStep(1f, TargetFade, currentLerp);
+                currentBrightness = Mathf.SmoothStep(1f, TargetBrightness, currentLerp);
                 currentLerp += Time.deltaTime / FadeOutTime;
                 yield return new WaitForEndOfFrame();
             }
@@ -113,7 +144,6 @@ namespace SSM24.FadeEmptyChests
             }
             catch (NullReferenceException)
             {
-                // epic 2
                 FadeEmptyChests.Log(LogLevel.Warning,
                     "Setting color failed, refreshing reference to renderers");
                 RefreshRenderers();
@@ -129,13 +159,12 @@ namespace SSM24.FadeEmptyChests
             }
             catch (NullReferenceException)
             {
-                // epic 3
                 FadeEmptyChests.Log(LogLevel.Warning,
                     "GetPropertyBlock failed, refreshing reference to renderers");
                 RefreshRenderers();
                 return;
             }
-            if (gameObject.name == "mdlBarrel1")
+            if (!HasDitherModel(renderer))
             {
                 propertyStorage.SetFloat("_Fade", currentFade);
             }
