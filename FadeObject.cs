@@ -81,7 +81,7 @@ namespace SSM24.FadeEmptyChests
                 if (renderer == null)
                 {
                     RefreshRenderers();
-                    FadeEmptyChests.Log(LogLevel.Warning,
+                    FadeEmptyChests.Log(LogLevel.Info,
                         "Renderers became null, refreshing reference to renderers");
                     result = false;
                     break;
@@ -144,7 +144,7 @@ namespace SSM24.FadeEmptyChests
             }
             catch (NullReferenceException)
             {
-                FadeEmptyChests.Log(LogLevel.Warning,
+                FadeEmptyChests.Log(LogLevel.Info,
                     "Setting color failed, refreshing reference to renderers");
                 RefreshRenderers();
                 return;
@@ -159,7 +159,7 @@ namespace SSM24.FadeEmptyChests
             }
             catch (NullReferenceException)
             {
-                FadeEmptyChests.Log(LogLevel.Warning,
+                FadeEmptyChests.Log(LogLevel.Info,
                     "GetPropertyBlock failed, refreshing reference to renderers");
                 RefreshRenderers();
                 return;
