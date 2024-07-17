@@ -67,6 +67,7 @@ namespace SSM24.FadeEmptyChests
             );
 
             On.EntityStates.Barrel.Opened.OnEnter += On_Opened_OnEnter;
+            On.RoR2.DelusionChestController.ResetChestForDelusion += On_DelusionChestController_ResetChestForDelusion;
             // TODO: figure out either clientside methods or a good way to sync it
             On.RoR2.RouletteChestController.Opened.OnEnter += On_Opened_OnEnter;
             On.RoR2.MultiShopController.OnPurchase += On_MultiShopController_OnPurchase;
@@ -128,6 +129,17 @@ namespace SSM24.FadeEmptyChests
             {
                 Transform transform = self.outer.commonComponents.modelLocator.modelTransform;
                 transform.GetChild(1).gameObject.AddComponent<FadeObject>();
+            }
+        }
+
+        private void On_DelusionChestController_ResetChestForDelusion(
+            On.RoR2.DelusionChestController.orig_ResetChestForDelusion orig, DelusionChestController self)
+        {
+            orig(self);
+            FadeObject fade = self.gameObject.GetComponent<ModelLocator>().modelTransform.GetComponent<FadeObject>();
+            if (fade != null)
+            {
+                Destroy(fade);
             }
         }
     }

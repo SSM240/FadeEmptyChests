@@ -175,10 +175,15 @@ namespace SSM24.FadeEmptyChests
             renderer.SetPropertyBlock(propertyStorage);
         }
 
-        // clean up leftover hooks
         private void OnDestroy()
         {
+            // clean up leftover hooks
             SceneCamera.onSceneCameraPreRender -= OnSceneCameraPreRender;
+
+            // manually reset brightness/fade
+            currentBrightness = 1f;
+            currentFade = 1f;
+            OnSceneCameraPreRender(null);
         }
     }
 }
