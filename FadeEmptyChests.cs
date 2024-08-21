@@ -128,6 +128,9 @@ namespace SSM24.FadeEmptyChests
             if (ShouldApplyToAdaptiveChests.Value && NetworkServer.active)
             {
                 Transform transform = self.outer.commonComponents.modelLocator.modelTransform;
+                // apparently 0 and 1 got switched around in an update or smth
+                // i can't be bothered to figure out a more proper way to do this so both of them get it :)
+                transform.GetChild(0).gameObject.AddComponent<FadeObject>();
                 transform.GetChild(1).gameObject.AddComponent<FadeObject>();
             }
         }
