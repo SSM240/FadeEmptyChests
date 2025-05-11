@@ -48,8 +48,7 @@
       <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="MMHOOK_RoR2">
-      <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\test\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
+      <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\vanilla plus but it works\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\SharedModpack\BepInEx\core\Mono.Cecil.dll</HintPath>
