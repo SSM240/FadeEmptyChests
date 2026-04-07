@@ -70,7 +70,7 @@ namespace SSM24.FadeEmptyChests
 
             ModSettingsManager.AddOption(new SliderOption(FadeMultiplier, new SliderConfig { max = 1 }));
             ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig { max = 1 }));
-            ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig { max = 5 }));
+            ModSettingsManager.AddOption(new SliderOption(FadeOutTime, new SliderConfig { max = 5 }));
 
             ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToMultishops));
             ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToAdaptiveChests));
