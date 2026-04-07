@@ -24,6 +24,7 @@ namespace SSM24.FadeEmptyChests
 
         private float currentFade = 1f;
         private float currentBrightness = 1f;
+        private bool lerpFinished;
 
         private void Start()
         {
@@ -100,6 +101,7 @@ namespace SSM24.FadeEmptyChests
                 currentLerp += Time.deltaTime / FadeOutTime;
                 yield return new WaitForEndOfFrame();
             }
+            lerpFinished = true;
             yield break;
         }
 
@@ -122,6 +124,13 @@ namespace SSM24.FadeEmptyChests
 
         private void OnSceneCameraPreRender(SceneCamera _)
         {
+            // continuously set so that changes to RiskOfOptions work
+            if (lerpFinished)
+            {
+                currentFade = TargetFade;
+                currentBrightness = TargetBrightness;
+            }
+
             for (int i = 0; i < renderers.Length; i++)
             {
                 Renderer renderer = renderers[i];

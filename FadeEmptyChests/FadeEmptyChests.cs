@@ -1,9 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Logging;
-using EntityStates;
-using MonoMod.Utils;
+using RiskOfOptions;
+using RiskOfOptions.OptionConfigs;
+using RiskOfOptions.Options;
 using RoR2;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,6 +12,7 @@ namespace SSM24.FadeEmptyChests
 {
     [BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.SSM24.FadeEmptyChests", "Fade Empty Chests", "1.0.0")]
+    [BepInDependency("com.rune580.riskofoptions")]
     public class FadeEmptyChests : BaseUnityPlugin
     {
         public static ConfigEntry<float> FadeMultiplier;
@@ -65,6 +67,35 @@ namespace SSM24.FadeEmptyChests
                 default_ShouldApplyToAdaptiveChests,
                 "Whether adaptive chests should fade out after use."
             );
+
+            ModSettingsManager.AddOption(new SliderOption(FadeMultiplier, new SliderConfig { max = 1 }));
+            ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig { max = 1 }));
+            ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig { max = 5 }));
+
+            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToMultishops));
+            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToAdaptiveChests));
+
+            // create icon from file
+            // mostly taken from https://github.com/Vl4dimyr/CaptainShotgunModes/blob/fdf828e/RiskOfOptionsMod.cs#L36-L48
+            // i have NO clue what this code is doing but it seems to work so... cool?
+            try
+            {
+                using Stream stream = File.OpenRead(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "icon.png"));
+                Texture2D texture = new Texture2D(0, 0);
+                byte[] imgData = new byte[stream.Length];
+
+                stream.Read(imgData, 0, (int)stream.Length);
+
+                if (ImageConversion.LoadImage(texture, imgData))
+                {
+                    ModSettingsManager.SetModIcon(
+                        Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0))
+                    );
+                }
+            }
+            catch (FileNotFoundException)
+            {
+            }
 
             On.EntityStates.Barrel.Opened.OnEnter += On_Opened_OnEnter;
             On.RoR2.DelusionChestController.ResetChestForDelusion += On_DelusionChestController_ResetChestForDelusion;
