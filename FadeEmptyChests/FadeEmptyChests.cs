@@ -87,30 +87,31 @@ namespace SSM24.FadeEmptyChests
         }
 
         private void On_MultiShopController_OnPurchase(
-            On.RoR2.MultiShopController.orig_OnPurchase orig, 
-            MultiShopController self, Interactor interactor, PurchaseInteraction purchaseInteraction)
+            On.RoR2.MultiShopController.orig_OnPurchase orig,
+            MultiShopController self, CostTypeDef.PayCostContext payCostContext, CostTypeDef.PayCostResults payCostResult)
         {
-            orig(self, interactor, purchaseInteraction);
+            orig(self, payCostContext, payCostResult);
+            if (self.isTripleDroneVendor)
+            {
+                return;
+            }
             if (ShouldApplyToMultishops.Value && NetworkServer.active)
             {
-                DynData<MultiShopController> controllerData = new DynData<MultiShopController>(self);
-                GameObject[] terminalGameObjects = controllerData.Get<GameObject[]>("_terminalGameObjects");
-                bool[] doCloseOnTerminalPurchase = controllerData.Get<bool[]>("doCloseOnTerminalPurchase");
                 // logic basically just copypasted from MultiShopController
                 bool noCard = false;
-                for (int i = 0; i < terminalGameObjects.Length; i++)
+                for (int i = 0; i < self.terminalGameObjects.Length; i++)
                 {
-                    GameObject terminalObject = terminalGameObjects[i];
+                    GameObject terminalObject = self.terminalGameObjects[i];
                     PurchaseInteraction interaction = terminalObject.GetComponent<PurchaseInteraction>();
-                    if (purchaseInteraction == interaction)
+                    if (payCostContext.purchaseInteraction == interaction)
                     {
                         terminalObject.AddComponent<FadeObject>();
-                        noCard = doCloseOnTerminalPurchase[i];
+                        noCard = self.doCloseOnTerminalPurchase[i];
                     }
                 }
                 if (noCard)
                 {
-                    foreach (GameObject terminalObject in terminalGameObjects)
+                    foreach (GameObject terminalObject in self.terminalGameObjects)
                     {
                         // don't double-add
                         if (terminalObject.GetComponent<FadeObject>() == null)
@@ -122,7 +123,7 @@ namespace SSM24.FadeEmptyChests
             }
         }
 
-        private void On_Opened_OnEnter(On.RoR2.RouletteChestController.Opened.orig_OnEnter orig, EntityState self)
+        private void On_Opened_OnEnter(On.RoR2.RouletteChestController.Opened.orig_OnEnter orig, RouletteChestController.Opened self)
         {
             orig(self);
             if (ShouldApplyToAdaptiveChests.Value && NetworkServer.active)
