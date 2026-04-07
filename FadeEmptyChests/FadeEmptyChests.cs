@@ -32,6 +32,7 @@ namespace SSM24.FadeEmptyChests
         public void Awake()
         {
             Instance = this;
+            Log.Init(Logger);
 
             FadeMultiplier = Config.Bind(
                 "FadeEmptyChests",
