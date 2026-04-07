@@ -69,12 +69,35 @@ namespace SSM24.FadeEmptyChests
                 "Whether adaptive chests should fade out after use."
             );
 
-            ModSettingsManager.AddOption(new SliderOption(FadeMultiplier, new SliderConfig { max = 1 }));
-            ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig { max = 1 }));
-            ModSettingsManager.AddOption(new SliderOption(FadeOutTime, new SliderConfig { max = 5 }));
+            ModSettingsManager.AddOption(new SliderOption(FadeMultiplier, new SliderConfig
+            { 
+                name = "Fade Multiplier",
+                description = "How much to fade empty containers.\n\n0% is fully transparent\n100% is fully opaque",
+                max = 1, 
+                FormatString = "{0:0%}" 
+            }));
+            ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig
+            {
+                name = "Brightness Multiplier",
+                description = "How much to darken empty containers.\n\n0% is fully black\n100% is normal brightness",
+                max = 1,
+                FormatString = "{0:0%}"
+            }));
+            ModSettingsManager.AddOption(new SliderOption(FadeOutTime, new SliderConfig
+            {
+                name = "Fade Out Time",
+                max = 5,
+                FormatString = "{0:0.00}s"
+            }));
 
-            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToMultishops));
-            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToAdaptiveChests));
+            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToMultishops, new CheckBoxConfig 
+            {
+                name = "Should Apply to Multishops"
+            }));
+            ModSettingsManager.AddOption(new CheckBoxOption(ShouldApplyToAdaptiveChests, new CheckBoxConfig
+            {
+                name = "Should Apply to Adaptive Chests"
+            }));
 
             // create icon from file
             // mostly taken from https://github.com/Vl4dimyr/CaptainShotgunModes/blob/fdf828e/RiskOfOptionsMod.cs#L36-L48
