@@ -20,13 +20,10 @@ namespace SSM24.FadeEmptyChests
         private Renderer[] renderers;
         private MaterialPropertyBlock propertyStorage;
         private List<Color> originalColors = new List<Color>();
+        private Dictionary<Renderer, DitherModel> ditherModels = new();
 
         private float currentFade = 1f;
         private float currentBrightness = 1f;
-
-        private static BindingFlags staticPrivate = BindingFlags.Static | BindingFlags.NonPublic;
-        private static List<DitherModel> instancesList =
-            (List<DitherModel>)typeof(DitherModel).GetField("instancesList", staticPrivate).GetValue(null);
 
         private void Start()
         {
@@ -38,27 +35,28 @@ namespace SSM24.FadeEmptyChests
 
         private bool HasDitherModel(Renderer renderer)
         {
-            // check for cached result in DynData
-            DynData<Renderer> rendererData = new DynData<Renderer>(renderer);
-            object hasDitherModelInData = rendererData["hasDitherModel"];
-            if (hasDitherModelInData != null)
+            // check for cached result in ditherModels
+            if (ditherModels.ContainsKey(renderer))
             {
-                return (bool)hasDitherModelInData;
+                return ditherModels[renderer] != null;
             }
             // if not found, loop through DitherModel instances
             bool foundInDitherModels = false;
-            // using DynData doesn't seem to work on static fields, have to use reflection
-            foreach (DitherModel ditherModel in instancesList)
+            FadeEmptyChests.Log(LogLevel.Debug,
+                $"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
+            foreach (DitherModel ditherModel in DitherModel.instancesList)
             {
                 if (ditherModel.renderers.Contains(renderer))
                 {
                     foundInDitherModels = true;
+                    ditherModels[renderer] = ditherModel;
                     break;
                 }
             }
-            FadeEmptyChests.Log(LogLevel.Debug, 
-                $"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
-            rendererData["hasDitherModel"] = foundInDitherModels;
+            if (!foundInDitherModels)
+            {
+                ditherModels[renderer] = null;
+            }
             return foundInDitherModels;
         }
 
@@ -152,27 +150,28 @@ namespace SSM24.FadeEmptyChests
 
         private void ChangeFade(Renderer renderer)
         {
-            try
-            {
-                renderer.GetPropertyBlock(propertyStorage);
-            }
-            catch (NullReferenceException)
-            {
-                FadeEmptyChests.Log(LogLevel.Info,
-                    "GetPropertyBlock failed, refreshing reference to renderers");
-                RefreshRenderers();
-                return;
-            }
             if (!HasDitherModel(renderer))
             {
+                try
+                {
+                    renderer.GetPropertyBlock(propertyStorage);
+                }
+                catch (NullReferenceException)
+                {
+                    FadeEmptyChests.Log(LogLevel.Info,
+                        "GetPropertyBlock failed, refreshing reference to renderers");
+                    RefreshRenderers();
+                    return;
+                }
                 propertyStorage.SetFloat("_Fade", currentFade);
+                renderer.SetPropertyBlock(propertyStorage);
             }
             else
             {
-                float oldFade = propertyStorage.GetFloat("_Fade");
-                propertyStorage.SetFloat("_Fade", oldFade * currentFade);
+                DitherModel ditherModel = ditherModels[renderer];
+                ditherModel.fade *= currentFade;
+                ditherModel.UpdateDither();
             }
-            renderer.SetPropertyBlock(propertyStorage);
         }
 
         private void OnDestroy()
