@@ -73,11 +73,6 @@ namespace SSM24.FadeEmptyChests
             On.RoR2.MultiShopController.OnPurchase += On_MultiShopController_OnPurchase;
         }
 
-        internal static void Log(LogLevel level, object data)
-        {
-            Instance.Logger.Log(level, data);
-        }
-
         private void On_Opened_OnEnter(
             On.EntityStates.Barrel.Opened.orig_OnEnter orig, EntityStates.Barrel.Opened self)
         {

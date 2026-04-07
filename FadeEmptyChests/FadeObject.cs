@@ -42,8 +42,7 @@ namespace SSM24.FadeEmptyChests
             }
             // if not found, loop through DitherModel instances
             bool foundInDitherModels = false;
-            FadeEmptyChests.Log(LogLevel.Debug,
-                $"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
+            Log.Debug($"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
             foreach (DitherModel ditherModel in DitherModel.instancesList)
             {
                 if (ditherModel.renderers.Contains(renderer))
@@ -78,8 +77,7 @@ namespace SSM24.FadeEmptyChests
                 if (renderer == null)
                 {
                     RefreshRenderers();
-                    FadeEmptyChests.Log(LogLevel.Info,
-                        "Renderers became null, refreshing reference to renderers");
+                    Log.Debug("Renderers became null, refreshing reference to renderers");
                     result = false;
                     break;
                 }
@@ -141,8 +139,7 @@ namespace SSM24.FadeEmptyChests
             }
             catch (NullReferenceException)
             {
-                FadeEmptyChests.Log(LogLevel.Info,
-                    "Setting color failed, refreshing reference to renderers");
+                Log.Debug("Setting color failed, refreshing reference to renderers");
                 RefreshRenderers();
                 return;
             }
@@ -158,8 +155,7 @@ namespace SSM24.FadeEmptyChests
                 }
                 catch (NullReferenceException)
                 {
-                    FadeEmptyChests.Log(LogLevel.Info,
-                        "GetPropertyBlock failed, refreshing reference to renderers");
+                    Log.Debug("GetPropertyBlock failed, refreshing reference to renderers");
                     RefreshRenderers();
                     return;
                 }
