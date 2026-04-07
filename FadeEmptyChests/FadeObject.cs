@@ -12,7 +12,9 @@ namespace SSM24.FadeEmptyChests
 {
     public class FadeObject : MonoBehaviour
     {
-        private float TargetFade => FadeEmptyChests.FadeMultiplier.Value;
+        private float TargetFade => isDrifter
+            ? FadeEmptyChests.DrifterFadeMultiplier.Value
+            : FadeEmptyChests.FadeMultiplier.Value;
         private float TargetBrightness => FadeEmptyChests.BrightnessMultiplier.Value;
         private float FadeOutTime => FadeEmptyChests.FadeOutTime.Value;
 
@@ -26,8 +28,12 @@ namespace SSM24.FadeEmptyChests
         private float currentBrightness = 1f;
         private bool lerpFinished;
 
+        private bool isDrifter;
+
         private void Start()
         {
+            isDrifter = LocalUserManager.GetFirstLocalUser()?.cachedBody.name.Contains("DrifterBody") ?? false;
+
             propertyStorage = new MaterialPropertyBlock();
             renderers = gameObject.GetComponentsInChildren<Renderer>();
             StartCoroutine(WaitUntilVisible());

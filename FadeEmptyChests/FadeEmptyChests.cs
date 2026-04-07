@@ -16,12 +16,14 @@ namespace SSM24.FadeEmptyChests
     public class FadeEmptyChests : BaseUnityPlugin
     {
         public static ConfigEntry<float> FadeMultiplier;
+        public static ConfigEntry<float> DrifterFadeMultiplier;
         public static ConfigEntry<float> BrightnessMultiplier;
         public static ConfigEntry<float> FadeOutTime;
         public static ConfigEntry<bool> ShouldApplyToMultishops;
         public static ConfigEntry<bool> ShouldApplyToAdaptiveChests;
 
         const float default_FadeMultiplier = 0.25f;
+        const float default_DrifterFadeMultiplier = 0.8f;
         const float default_BrightnessMultiplier = 0.5f;
         const float default_FadeOutTime = 1f;
         const bool default_ShouldApplyToMultishops = false;
@@ -39,6 +41,13 @@ namespace SSM24.FadeEmptyChests
                 "FadeMultiplier",
                 default_FadeMultiplier,
                 "How much to fade empty containers. " + 
+                "(0 = transparent, 1 = opaque)"
+            );
+            DrifterFadeMultiplier = Config.Bind(
+                "FadeEmptyChests",
+                "DrifterFadeMultiplier",
+                default_DrifterFadeMultiplier,
+                "How much to fade empty containers when playing as Drifter. " +
                 "(0 = transparent, 1 = opaque)"
             );
             BrightnessMultiplier = Config.Bind(
@@ -75,6 +84,14 @@ namespace SSM24.FadeEmptyChests
                 description = "How much to fade empty containers.\n\n0% is fully transparent\n100% is fully opaque",
                 max = 1, 
                 FormatString = "{0:0%}" 
+            }));
+            ModSettingsManager.AddOption(new SliderOption(DrifterFadeMultiplier, new SliderConfig
+            {
+                name = "Drifter Fade Multiplier",
+                description = "How much to fade empty containers, specifically when playing as Drifter.\n\n" +
+                "0% is fully transparent\n100% is fully opaque",
+                max = 1,
+                FormatString = "{0:0%}"
             }));
             ModSettingsManager.AddOption(new SliderOption(BrightnessMultiplier, new SliderConfig
             {
