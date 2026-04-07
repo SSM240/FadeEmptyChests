@@ -1,3 +1,9 @@
+### v1.2.0
+Gearbox actually fixed dithering WOOOOO! Ok they actually fixed it like, 4 months ago but I was having a case of Insanely Fucking Lazy Syndrome so the update took until now sorry ;w;
+* Updated to work properly on the latest Alloyed Collective patch.
+* Added Risk of Options support.
+* Added new fade multiplier option for when you're playing as Drifter, defaulting to 80% for only a slight fade.
+
 ### v1.1.4
 Updated the readme to clarify that I did undeprecate it on purpose (it is a huge pain in the ass that I have to make a new version just to update the readme lol)
 
