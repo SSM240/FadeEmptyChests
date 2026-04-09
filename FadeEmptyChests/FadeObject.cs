@@ -49,7 +49,6 @@ namespace SSM24.FadeEmptyChests
             }
             // if not found, loop through DitherModel instances
             bool foundInDitherModels = false;
-            Log.Debug($"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
             foreach (DitherModel ditherModel in DitherModel.instancesList)
             {
                 if (ditherModel.renderers.Contains(renderer))
@@ -59,6 +58,7 @@ namespace SSM24.FadeEmptyChests
                     break;
                 }
             }
+            Log.Debug($"Caching result of HasDitherModel for {gameObject.name}: {foundInDitherModels}");
             if (!foundInDitherModels)
             {
                 ditherModels[renderer] = null;
